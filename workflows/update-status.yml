@@ -1,1 +1,27 @@
+name: Update Status
 
+on:
+  issues:
+    types:
+      - closed
+  milestone:
+    types:
+      - closed
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update Project Board
+        uses: actions/github-script@0.9.0
+        with:
+          github-token: ${{ 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 }}
+          script: |
+            const columns = ['Lesson 1', 'Lesson 2', 'Lesson 3']; // Укажите названия своих колонок
+            const { data: issues } = await github.issues.listForRepo({ owner: context.repo.owner, repo: context.repo.repo });
+            for (const issue of issues) {
+              const milestone = issue.milestone ? issue.milestone.title : null;
+              if (columns.includes(milestone)) {
+                await github.projects.moveCard({ card_id: issue.number, position: 'top', column_id: columns.indexOf(milestone) + 1 });
+              }
+            }
